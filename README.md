@@ -378,5 +378,5 @@ Ce projet est distribué sous licence MIT. Voir le fichier `LICENSE` pour plus d
 
 ---
 <p align="center">
-  <sub>Développé avec ❤️ pour la sécurité des infrastructures</sub>
+  <sub>Développé avec ❤️ par Louis pour la sécurité des infrastructures</sub>
 </p>
