@@ -1,22 +1,88 @@
-# Détection d'élévation de privilèges Domain Admin avec CrowdSec
+# CrowdSec - Détection d'élévation de privilèges Domain Admin
 
-Ce projet implémente une solution de détection d'élévation de privilèges domain admin en utilisant CrowdSec, une solution open-source de sécurité collaborative. Le système analyse les logs pour détecter quand un utilisateur devient domain admin et génère des alertes en temps réel.
+[![GitHub](https://img.shields.io/github/license/LouisDecourtis/crowdsecly?color=blue)](https://github.com/LouisDecourtis/crowdsecly/blob/main/LICENSE)
+[![CrowdSec](https://img.shields.io/badge/CrowdSec-v1.5.3-blue)](https://crowdsec.net/)
+[![Docker](https://img.shields.io/badge/Docker-required-blue)](https://www.docker.com/)
+[![Status](https://img.shields.io/badge/Status-Proof%20of%20Concept-orange)]()
+[![Documentation](https://img.shields.io/badge/Documentation-Comprehensive-green)]()
+
+<p align="center">
+  <img src="https://docs.crowdsec.net/img/crowdsec_logo.png" alt="CrowdSec Logo" width="250"/>
+</p>
 
 ## Table des matières
 
+- [Description](#description)
+- [Fonctionnalités clés](#fonctionnalités-clés)
+- [Démarrage rapide et Installation](#démarrage-rapide-et-installation)
 - [Architecture](#architecture)
+  - [Diagramme de séquence](#diagramme-de-séquence)
 - [Prérequis](#prérequis)
-- [Installation](#installation)
 - [Configuration](#configuration)
-  - [Structure des fichiers](#structure-des-fichiers)
-  - [Parsers personnalisés](#parsers-personnalisés)
-  - [Scénario de détection](#scénario-de-détection)
+  - [Acquisition des logs](#acquisition-des-logs)
+  - [Parsers](#parsers)
+  - [Scénario](#scénario)
+  - [Profil de notification](#profil-de-notification)
+  - [Webhook](#webhook)
 - [Utilisation](#utilisation)
-  - [Démarrage](#démarrage)
-  - [Test](#test)
+  - [Tester la détection](#tester-la-détection)
   - [Visualisation des alertes](#visualisation-des-alertes)
+  - [Notifications Webhook](#notifications-webhook)
+- [Structure des fichiers](#structure-des-fichiers)
 - [Dépannage](#dépannage)
-- [Fonctionnement technique](#fonctionnement-technique)
+- [Contribuer](#contribuer)
+- [Licence](#licence)
+
+## Description
+
+Ce projet implémente une solution de détection d'élévation de privilèges domain admin en utilisant CrowdSec, une solution open-source de sécurité collaborative. Le système analyse les logs pour détecter quand un utilisateur devient domain admin et génère des alertes en temps réel.
+
+## Fonctionnalités clés
+
+<table>
+  <tr>
+    <td align="center"></td>
+    <td><b>Détection en temps réel</b> des élévations de privilèges domain admin</td>
+  </tr>
+  <tr>
+    <td align="center"></td>
+    <td><b>Pipeline de traitement</b> configurable pour l'analyse des logs</td>
+  </tr>
+  <tr>
+    <td align="center"></td>
+    <td><b>Alertes instantanées</b> via webhook pour réponse rapide aux incidents</td>
+  </tr>
+  <tr>
+    <td align="center"></td>
+    <td><b>Déploiement Docker</b> simplifié pour une mise en place rapide</td>
+  </tr>
+  <tr>
+    <td align="center"></td>
+    <td><b>Intégration facile</b> avec d'autres systèmes de sécurité (SIEM, SOAR)</td>
+  </tr>
+</table>
+
+## Démarrage rapide et Installation
+
+```bash
+# 1. Cloner le dépôt
+git clone https://github.com/LouisDecourtis/crowdsecly.git
+cd crowdsecly
+
+# 2. Démarrer CrowdSec
+docker run -d --name crowdsec \
+  -p 8080:8080 \
+  -v $(pwd)/config:/etc/crowdsec \
+  -v $(pwd)/data:/var/lib/crowdsec/data \
+  -v $(pwd)/tests:/tests \
+  crowdsecurity/crowdsec:latest
+
+# 3. Tester la détection
+echo "May 1 12:34:56 host Process: Est devenu domain Admin" >> tests/nginx/nginx.log
+
+# 4. Vérifier les alertes
+docker exec crowdsec cscli alerts list
+```
 
 ## Architecture
 
@@ -33,29 +99,24 @@ Le flux de données est le suivant :
 4. Le scénario évalue si une élévation de privilèges a eu lieu
 5. Une alerte est générée si le scénario est déclenché
 
+<p align="center">
+  <img src="images/architecture.png" alt="Architecture du système" width="800"/>
+</p>
+
+> **Note**: Les intégrations avec les SIEM/SOAR et les alertes par email visibles sur le diagramme ne sont pas encore implémentées dans ce projet. Elles sont représentées à titre indicatif pour montrer les possibilités d'extension du système.
+
+### Diagramme de séquence
+
+Le diagramme ci-dessous illustre la séquence des opérations depuis la génération d'un log jusqu'à l'envoi de la notification :
+
+<p align="center">
+  <img src="images/sequence.png" alt="Diagramme de séquence" width="800"/>
+</p>
+
 ## Prérequis
 
 - Docker
 - Accès en lecture/écriture au répertoire du projet
-
-## Installation
-
-1. Clonez ce dépôt :
-   ```bash
-   git clone https://github.com/LouisDecourtis/crowdsecly.git
-   cd crowdsecly
-   ```
-
-2. Lancez le conteneur CrowdSec :
-   ```bash
-   docker run -d --name crowdsec \
-     -v $(pwd)/config:/etc/crowdsec \
-     -v $(pwd)/data:/var/lib/crowdsec/data \
-     -v $(pwd)/tests:/tests:ro \
-     -p 8080:8080 \
-     crowdsecurity/crowdsec:latest
-   ```
-> **Note**: Le port 8080 est utilisé pour l'API locale (LAPI) de CrowdSec, qui permet aux bouncers et à l'interface de communication avec le moteur CrowdSec.
 
 ## Configuration
 
@@ -65,11 +126,14 @@ Le flux de données est le suivant :
 crowdsec-local/
 ├── config/                      # Configuration CrowdSec
 │   ├── acquis.yaml              # Configuration d'acquisition des logs
+│   ├── notifications/
+│   │   └── http.yaml            # Configuration des notifications webhook
 │   ├── parsers/
 │   │   ├── s00-raw/
 │   │   │   └── custom-domain-admin-parser.yaml  # Parser initial
 │   │   └── s01-parse/
 │   │       └── domain-admin-s01.yaml           # Parser de préservation
+│   ├── profiles.yaml            # Profils de notification et de décision
 │   └── scenarios/
 │       └── detect-domain-admin.yaml            # Scénario de détection
 ├── data/                        # Données persistantes CrowdSec
@@ -172,6 +236,74 @@ Pour vérifier si une alerte a été générée :
 docker exec crowdsec cscli alerts list
 ```
 
+<p align="center">
+  <img src="images/alertslist.png" alt="CrowdSec Alerts List" width="800"/>
+</p>
+
+### Notifications Webhook
+
+Le système est configuré pour envoyer automatiquement des notifications à un webhook lorsqu'une alerte d'élévation de privilèges domain admin est détectée. Cette fonctionnalité permet d'intégrer facilement la détection avec d'autres systèmes ou outils.
+
+#### Configuration des notifications
+
+La configuration des notifications se fait en deux parties :
+
+1. **Configuration du webhook** dans `config/notifications/http.yaml` :
+   ```yaml
+   type: http
+   name: http_default
+   log_level: info
+   format: |
+     {{.|toJson}}
+   url: https://webhook.site/votre-webhook-id
+   method: POST
+   ```
+
+2. **Profil de notification** dans `config/profiles.yaml` :
+   ```yaml
+   name: domain_admin_notification
+   debug: true
+   filters:
+     - Alert.GetScenario() == "local/detect-domain-admin"
+   decisions: []  # Pas de décision de remédiation, juste une notification
+   notifications:
+     - http_default
+   on_success: continue
+   ```
+
+#### Flux de traitement complet
+
+Voici comment fonctionne le processus de bout en bout :
+
+1. **Log d'origine** : Une entrée de log est détectée
+   ```
+   May 1 12:34:56 host Process: Est devenu domain Admin
+   ```
+
+2. **Parsing initial** : Le parser `custom-domain-admin-parser.yaml` extrait les champs
+   ```yaml
+   # Champs extraits
+   timestamp: May 1 12:34:56
+   hostname: host
+   program: Process
+   message: Est devenu domain Admin
+   log_type: domain_admin_log
+   ```
+
+3. **Préservation** : Le parser `domain-admin-s01.yaml` préserve le log en stage s01-parse
+
+4. **Détection** : Le scénario `detect-domain-admin.yaml` détecte le message spécifique
+
+5. **Notification** : Le profil `domain_admin_notification` envoie une alerte au webhook
+
+#### Exemple de payload webhook
+
+<p align="center">
+  <img src="images/webhook.png" alt="Webhook Payload" width="800"/>
+</p>
+
+Cette intégration permet d'automatiser les réponses aux incidents d'élévation de privilèges, en connectant la détection à d'autres systèmes comme des SIEM, des outils de ticketing, ou des systèmes d'alertes.
+
 ## Dépannage
 
 ### Logs de débogage
@@ -223,3 +355,28 @@ CrowdSec traite les logs en plusieurs étapes :
    - Une alerte est créée avec le hostname comme scope
 
 Cette architecture modulaire permet d'adapter facilement le système à d'autres types de détection en ajoutant de nouveaux parsers et scénarios.
+
+## Contribuer
+
+Les contributions à ce projet sont les bienvenues ! Voici comment vous pouvez contribuer :
+
+1. **Fork** le projet
+2. Créez votre branche de fonctionnalité (`git checkout -b feature/AmazingFeature`)
+3. Committez vos changements (`git commit -m 'Add some AmazingFeature'`)
+4. Poussez vers la branche (`git push origin feature/AmazingFeature`)
+5. Ouvrez une **Pull Request**
+
+Vous pouvez également contribuer en :
+
+- Signalant des bugs
+- Proposant de nouvelles fonctionnalités
+- Améliorant la documentation
+
+## Licence
+
+Ce projet est distribué sous licence MIT. Voir le fichier `LICENSE` pour plus d'informations.
+
+---
+<p align="center">
+  <sub>Développé avec ❤️ pour la sécurité des infrastructures</sub>
+</p>

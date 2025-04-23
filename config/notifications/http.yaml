@@ -18,7 +18,7 @@ format: |
   {{.|toJson}}
 
 # The plugin will make requests to this url, eg:  https://www.example.com/
-url: <HTTP_url>
+url: https://webhook.site/5fd89e13-e3a0-4716-8d31-6677732e57ab
 
 # Any of the http verbs: "POST", "GET", "PUT"...
 method: POST
@@ -26,11 +26,10 @@ method: POST
 # headers:
 #   Authorization: token 0x64312313
 
-# skip_tls_verification:  # true or false. Default is false
+# skip_tls_verification: false  # true or false. Default is false
 
 ---
 
 # type: http
 # name: http_second_notification
 # ...
-

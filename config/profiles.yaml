@@ -27,3 +27,12 @@ decisions:
 #   - http_default   # Set the required http parameters in /etc/crowdsec/notifications/http.yaml before enabling this.
 #   - email_default  # Set the required email parameters in /etc/crowdsec/notifications/email.yaml before enabling this.
 on_success: break
+---
+name: domain_admin_notification
+debug: true
+filters:
+  - Alert.GetScenario() == "local/detect-domain-admin"
+decisions: []  # Pas de décision de remédiation, juste une notification
+notifications:
+  - http_default  # Utilise la configuration HTTP que nous avons mise à jour
+on_success: continue
