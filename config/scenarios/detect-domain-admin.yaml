@@ -1,7 +1,7 @@
 type: trigger
 name: local/detect-domain-admin
 description: "Détecte le log 'Est devenu domain Admin'"
-filter: "Match('Est devenu domain Admin', evt.Parsed.message) || Match('Est devenu domain Admin', evt.Meta.message)"
+filter: "Match('Est devenu domain Admin', evt.Parsed.message)"
 scope:
   type: Hostname
   expression: evt.Parsed.hostname
