@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/LouisDecourtis/crowdsecly/blob/master/LICENSE)
 [![CrowdSec](https://img.shields.io/badge/CrowdSec-v1.5.3-blue)](https://crowdsec.net/)
 [![Docker](https://img.shields.io/badge/Docker-required-blue)](https://www.docker.com/)
-[![Status](https://img.shields.io/badge/Status-Proof%20of%20Concept-orange)]()
+[![Status](https://img.shields.io/badge/Status-Functional-brightgreen)]()
 [![Documentation](https://img.shields.io/badge/Documentation-Comprehensive-green)]()
 
 <p align="center">
@@ -79,7 +79,7 @@ docker run -d --name crowdsec \
   crowdsecurity/crowdsec:latest
 
 # 3. Tester la détection
-echo "May 1 12:34:56 host Process: Est devenu domain Admin" >> tests/nginx/nginx.log
+echo "Apr 23 17:10:30 dc12-srv15 ActiveDirectory[54321]: SECURITY: User adminroot has been granted Domain Admin privileges" >> tests/nginx/nginx.log
 
 # 4. Vérifier les alertes
 docker exec crowdsec cscli alerts list
@@ -130,62 +130,35 @@ crowdsec-local/
 │   ├── notifications/
 │   │   └── http.yaml            # Configuration des notifications webhook
 │   ├── parsers/
-│   │   ├── s00-raw/
-│   │   │   └── custom-domain-admin-parser.yaml  # Parser initial
 │   │   └── s01-parse/
-│   │       └── domain-admin-s01.yaml           # Parser de préservation
+│   │       └── domain-admin-s01.yaml  # Parser pour la détection Domain Admin
 │   ├── profiles.yaml            # Profils de notification et de décision
 │   └── scenarios/
-│       └── detect-domain-admin.yaml            # Scénario de détection
+│       └── detect-domain-admin.yaml   # Scénario de détection
 ├── data/                        # Données persistantes CrowdSec
+├── CHANGELOG.md                 # Journal des modifications
 └── tests/                       # Répertoire de test
     └── nginx/
         └── nginx.log            # Fichier de log de test
 ```
 
-### Parsers personnalisés
+### Parser personnalisé
 
-Deux parsers personnalisés ont été créés pour traiter correctement les logs d'élévation de privilèges :
-
-#### 1. Parser initial (s00-raw)
-
-Ce parser extrait les informations de base du log au format syslog :
-
-```yaml
-# config/parsers/s00-raw/custom-domain-admin-parser.yaml
-filter: "evt.Line.Labels.type == 'syslog'"
-name: local/domain-admin-parser
-description: "Parser pour détecter les logs d'élévation de privilèges domain admin"
-debug: true
-onsuccess: next_stage
-nodes:
-  - grok:
-      pattern: "%{SYSLOGTIMESTAMP:timestamp} %{HOSTNAME:hostname} %{DATA:program}: %{GREEDYDATA:message}"
-      apply_on: Line.Raw
-statics:
-  - meta: program
-    expression: evt.Parsed.program
-  - meta: message
-    expression: evt.Parsed.message
-  - meta: log_type
-    value: domain_admin_log
-```
-
-#### 2. Parser de préservation (s01-parse)
-
-Ce parser s'assure que les logs identifiés comme "domain_admin_log" ne sont pas abandonnés au stage s01-parse :
+Notre solution utilise un parser simplifié qui détecte les mentions de "Domain Admin" dans les logs au format syslog standard :
 
 ```yaml
 # config/parsers/s01-parse/domain-admin-s01.yaml
-filter: "evt.Meta.log_type == 'domain_admin_log'"
+filter: 'evt.Parsed.message contains "Domain Admin"'
 name: local/domain-admin-s01
-description: "Parser pour préserver les logs domain admin en s01-parse"
+description: "Parser pour détecter les logs domain admin"
 debug: true
 onsuccess: next_stage
 statics:
   - parsed: domain_admin
     value: "true"
 ```
+
+Ce parser identifie les logs pertinents et les marque avec un attribut `domain_admin: true`, qui sera ensuite utilisé par le scénario de détection.
 
 ### Scénario de détection
 
@@ -195,14 +168,16 @@ Le scénario qui déclenche une alerte lorsqu'un utilisateur devient domain admi
 # config/scenarios/detect-domain-admin.yaml
 type: trigger
 name: local/detect-domain-admin
-description: "Détecte le log 'Est devenu domain Admin'"
-filter: "Match('Est devenu domain Admin', evt.Parsed.message) || Match('Est devenu domain Admin', evt.Meta.message)"
+description: "Détecte les élévations de privilèges domain admin"
+filter: evt.Parsed.domain_admin == 'true'
 scope:
   type: Hostname
-  expression: evt.Parsed.hostname
+  expression: evt.Meta.machine
 labels:
   severity: info
   service: custom
+  remediation: false
+blackhole: 1m
 ```
 
 ## Utilisation
@@ -226,7 +201,7 @@ docker restart crowdsec
 Pour tester la détection, ajoutez une entrée de log simulant une élévation de privilèges :
 
 ```bash
-echo "May 1 12:34:56 host Process: Est devenu domain Admin" >> tests/nginx/nginx.log
+echo "Apr 23 17:10:30 srv15 ActiveDirectory[54321]: SECURITY: User adminroot has been granted Domain Admin privileges" >> tests/nginx/nginx.log
 ```
 
 ### Visualisation des alertes
@@ -276,26 +251,31 @@ La configuration des notifications se fait en deux parties :
 
 Voici comment fonctionne le processus de bout en bout :
 
-1. **Log d'origine** : Une entrée de log est détectée
+1. **Log d'origine** : Une entrée de log est détectée au format syslog standard
    ```
-   May 1 12:34:56 host Process: Est devenu domain Admin
+   Apr 23 17:10:30 srv15 ActiveDirectory[54321]: SECURITY: User adminroot has been granted Domain Admin privileges
    ```
 
-2. **Parsing initial** : Le parser `custom-domain-admin-parser.yaml` extrait les champs
+2. **Parsing syslog** : Le parser standard de CrowdSec (crowdsecurity/syslog-logs) traite le log
    ```yaml
-   # Champs extraits
-   timestamp: May 1 12:34:56
-   hostname: host
-   program: Process
-   message: Est devenu domain Admin
-   log_type: domain_admin_log
+   # Champs extraits automatiquement
+   timestamp: Apr 23 17:10:30
+   hostname: srv15
+   program: ActiveDirectory
+   message: SECURITY: User adminroot has been granted Domain Admin privileges
    ```
 
-3. **Préservation** : Le parser `domain-admin-s01.yaml` préserve le log en stage s01-parse
+3. **Détection** : Notre parser `domain-admin-s01.yaml` détecte la mention "Domain Admin" et marque l'événement
+   ```yaml
+   # Marqueur ajouté
+   domain_admin: true
+   ```
 
-4. **Détection** : Le scénario `detect-domain-admin.yaml` détecte le message spécifique
+4. **Évaluation** : Le scénario `detect-domain-admin.yaml` détecte le marqueur et génère une alerte
 
-5. **Notification** : Le profil `domain_admin_notification` envoie une alerte au webhook
+5. **Notification** : Le profil `domain_admin_notification` envoie une alerte au webhook configuré
+
+Cette architecture simple et efficace permet une détection fiable tout en minimisant la complexité du système.
 
 #### Exemple de payload webhook
 
@@ -326,13 +306,22 @@ docker exec -it crowdsec crowdsec -c /etc/crowdsec/config.yaml -dsn file:///test
 ### Problèmes courants
 
 1. **Aucune alerte n'est générée** :
-   - Vérifiez que le format du log correspond au pattern attendu
-   - Assurez-vous que les parsers sont correctement chargés (`docker exec crowdsec cscli parsers list`)
-   - Vérifiez que le scénario est actif (`docker exec crowdsec cscli scenarios list`)
+   - Vérifiez que le format du log correspond au format syslog standard
+   - Assurez-vous que le message contient bien la phrase "Domain Admin"
+   - Vérifiez que CrowdSec détecte les modifications de fichier (paramètre `poll_without_inotify: true` dans acquis.yaml)
+   - Vérifiez les logs avec `docker logs crowdsec | grep domain-admin`
 
-2. **Container qui crash** :
-   - Vérifiez la syntaxe YAML des fichiers de configuration
-   - Assurez-vous que les expressions dans les filtres sont valides
+2. **Hostname incorrect dans les alertes** :
+   - Vérifiez que le format syslog inclut bien un hostname valide
+   - Assurez-vous que le scope du scénario utilise bien `evt.Meta.machine`
+
+3. **Notifications non envoyées** :
+   - Vérifiez l'URL du webhook dans `http.yaml`
+   - Vérifiez que le profil de notification est correctement configuré
+   - Consultez les logs pour voir si des erreurs sont signalées lors de l'envoi
+
+4. **Performances** :
+   - Si vous avez un volume important de logs, ajustez le paramètre `blackhole` dans le scénario pour éviter les alertes répétitives
 
 ## Changelog
 
