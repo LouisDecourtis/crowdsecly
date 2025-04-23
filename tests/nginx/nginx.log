@@ -2,3 +2,32 @@ May 1 12:34:56 host Process: Est devenu domain Admin
 May 1 12:34:56 host Process: Est devenu domain Admin
 May 1 12:34:56 host Process: Est devenu domain Admin
 May 1 12:34:56 host Process: Est devenu domain Admin
+May 1 12:34:56 host Process: Est devenu domain Admin
+
+# Format syslog RFC 3164 standard
+Apr 23 14:25:01 dc1-srv01 security[12345]: User jdupont has been added to Domain Admins group
+Apr 23 14:26:15 dc1-srv01 ActiveDirectory[12345]: SECURITY: User mmartin has been granted Domain Admin privileges
+Apr 23 14:30:22 dc1-srv01 lsass[12345]: AUDIT: Elevated privileges detected - User pdurand added to group 'Domain Admins'
+Apr 23 14:28:45 dc1-srv01 security[12345]: User testuser has been added to Domain Admins group
+Apr 23 14:30:15 dc1-srv01 ActiveDirectory[12345]: SECURITY: User admin has been granted Domain Admin privileges
+Apr 23 14:35:22 dc1-srv01 security[12345]: User testadmin has been added to Domain Admins group
+Apr 23 14:40:15 dc2-srv01 ActiveDirectory[12345]: SECURITY: User superadmin has been granted Domain Admin privileges
+Apr 23 14:45:30 dc3-srv01 lsass[12345]: AUDIT: Elevated privileges detected - User admin2 added to group 'Domain Admins'
+Apr 23 14:55:45 dc4-srv02 ActiveDirectory[54321]: SECURITY: User poweradmin has been added to Domain Admins
+Apr 23 15:05:20 dc5-srv03 ActiveDirectory[98765]: SECURITY: User adminsuper has been added to Domain Admins
+Apr 23 15:15:30 dc6-srv04 security[54321]: User superuser has been added to Domain Admins group
+Apr 23 15:25:45 dc7-srv05 security[98765]: User adminpower has been added to Domain Admins group
+Apr 23 15:35:15 dc8-srv06 ActiveDirectory[65432]: SECURITY: User adminroot has been granted Domain Admin privileges
+Apr 23 15:45:30 dc9-srv07 security[87654]: User superadmin has been added to Domain Admins group
+Apr 23 15:55:45 dc10-srv08 security[12345]: User rootadmin has been added to Domain Admins group
+Apr 23 15:55:45 dc10-srv08 security[12345]: User rootadmin has been added to Domain Admins group
+Apr 23 15:55:45 dc10-srv08 security[12345]: User rootadmin has been added to Domain Admins group
+Apr 23 15:55:45 dc10-srv08 security[12345]: User rootadmin has been added to Domain Admins group
+Apr 23 16:05:15 dc11-srv09 security[54321]: User superuser has been added to Domain Admins group
+Apr 23 16:15:30 dc12-srv10 lsass[98765]: AUDIT: User rootadmin has been added to Domain Admins group
+Apr 23 16:25:45 dc13-srv11 security[12345]: User adminsuper has been added to Domain Admins group
+Apr 23 16:35:15 dc14-srv12 security[54321]: User superuser has been added to Domain Admins group
+Apr 23 16:45:30 dc15-srv13 lsass[12345]: User rootadmin2 was granted Domain Admin privileges
+Apr 23 17:00:00 dc15-srv13 security[54321]: User superadmin has been added to Domain Admins group
+Apr 23 17:05:15 dc16-srv14 security[12345]: User admin123 has been added to Domain Admins group
+Apr 23 17:10:30 dc17-srv15 ActiveDirectory[54321]: SECURITY: User adminroot has been granted Domain Admin privileges

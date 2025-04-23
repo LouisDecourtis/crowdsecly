@@ -1,5 +1,9 @@
 source: file
 filenames:
   - /tests/nginx/nginx.log
+poll_without_inotify: true
 labels:
   type: syslog
+  use_time_machine_timestamp: true
+  log_level: info
+  machine: auto

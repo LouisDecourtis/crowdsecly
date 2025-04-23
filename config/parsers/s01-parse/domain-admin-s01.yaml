@@ -1,4 +1,4 @@
-filter: "evt.Meta.log_type == 'domain_admin_log'"
+filter: "evt.Parsed.message contains 'Domain Admin'"
 name: local/domain-admin-s01
 description: "Parser pour préserver les logs domain admin en s01-parse"
 debug: true

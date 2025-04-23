@@ -1,10 +1,10 @@
 type: trigger
 name: local/detect-domain-admin
-description: "Détecte le log 'Est devenu domain Admin'"
-filter: "Match('Est devenu domain Admin', evt.Parsed.message)"
+description: "Détecte les élévations de privilèges domain admin"
+filter: evt.Parsed.domain_admin == 'true'
 scope:
   type: Hostname
-  expression: evt.Parsed.hostname
+  expression: evt.Meta.machine
 labels:
   severity: info
   service: custom

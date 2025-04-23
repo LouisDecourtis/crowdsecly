@@ -30,6 +30,7 @@
   - [Notifications Webhook](#notifications-webhook)
 - [Structure des fichiers](#structure-des-fichiers)
 - [Dépannage](#dépannage)
+- [Changelog](#changelog)
 - [Contribuer](#contribuer)
 - [Licence](#licence)
 
@@ -333,28 +334,16 @@ docker exec -it crowdsec crowdsec -c /etc/crowdsec/config.yaml -dsn file:///test
    - Vérifiez la syntaxe YAML des fichiers de configuration
    - Assurez-vous que les expressions dans les filtres sont valides
 
-## Fonctionnement technique
+## Changelog
 
-### Pipeline de traitement CrowdSec
+### Dernières mises à jour (v1.1.0 - 2025-04-23)
 
-CrowdSec traite les logs en plusieurs étapes :
+- ✅ **Support standard des logs syslog** - Détection automatique des logs au format syslog standard
+- 🔍 **Extraction précise du hostname** - Le hostname apparaît correctement dans les alertes
+- ⚡ **Architecture optimisée** - Parsers simplifiés et scénarios plus efficaces
+- 🔔 **Notifications fiables** - Amélioration du déclenchement des alertes en temps réel
 
-1. **s00-raw** : Parsing initial des logs bruts
-   - Notre parser `custom-domain-admin-parser.yaml` extrait les champs de base
-
-2. **s01-parse** : Parsing spécifique par application
-   - Notre parser `domain-admin-s01.yaml` préserve les logs pour qu'ils ne soient pas abandonnés
-
-3. **s02-enrich** : Enrichissement des données
-   - Les parsers standard ajoutent des informations contextuelles
-
-4. **Évaluation des scénarios**
-   - Notre scénario `detect-domain-admin.yaml` vérifie si le message contient "Est devenu domain Admin"
-
-5. **Génération d'alertes**
-   - Une alerte est créée avec le hostname comme scope
-
-Cette architecture modulaire permet d'adapter facilement le système à d'autres types de détection en ajoutant de nouveaux parsers et scénarios.
+Pour plus de détails, consultez le [CHANGELOG.md](./CHANGELOG.md) complet.
 
 ## Contribuer
 
