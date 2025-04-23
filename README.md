@@ -1,13 +1,13 @@
 # CrowdSec - Détection d'élévation de privilèges Domain Admin
 
-[![GitHub](https://img.shields.io/github/license/LouisDecourtis/crowdsecly?color=blue)](https://github.com/LouisDecourtis/crowdsecly/blob/main/LICENSE)
+[![GitHub](https://img.shields.io/github/license/LouisDecourtis/crowdsecly?color=blue)](https://github.com/LouisDecourtis/crowdsecly/blob/master/LICENSE)
 [![CrowdSec](https://img.shields.io/badge/CrowdSec-v1.5.3-blue)](https://crowdsec.net/)
 [![Docker](https://img.shields.io/badge/Docker-required-blue)](https://www.docker.com/)
 [![Status](https://img.shields.io/badge/Status-Proof%20of%20Concept-orange)]()
 [![Documentation](https://img.shields.io/badge/Documentation-Comprehensive-green)]()
 
 <p align="center">
-  <img src="https://docs.crowdsec.net/img/crowdsec_logo.png" alt="CrowdSec Logo" width="250"/>
+  <img src="https://docs.crowdsec.net/img/crowdsec_logo.png" alt="CrowdSec Logo" width="350"/>
 </p>
 
 ## Table des matières
@@ -41,23 +41,23 @@ Ce projet implémente une solution de détection d'élévation de privilèges do
 
 <table>
   <tr>
-    <td align="center"></td>
+    <td align="center"><b>🔍</b></td>
     <td><b>Détection en temps réel</b> des élévations de privilèges domain admin</td>
   </tr>
   <tr>
-    <td align="center"></td>
+    <td align="center"><b>🔄</b></td>
     <td><b>Pipeline de traitement</b> configurable pour l'analyse des logs</td>
   </tr>
   <tr>
-    <td align="center"></td>
+    <td align="center"><b>🚨</b></td>
     <td><b>Alertes instantanées</b> via webhook pour réponse rapide aux incidents</td>
   </tr>
   <tr>
-    <td align="center"></td>
+    <td align="center"><b>🐳</b></td>
     <td><b>Déploiement Docker</b> simplifié pour une mise en place rapide</td>
   </tr>
   <tr>
-    <td align="center"></td>
+    <td align="center"><b>🔌</b></td>
     <td><b>Intégration facile</b> avec d'autres systèmes de sécurité (SIEM, SOAR)</td>
   </tr>
 </table>
@@ -100,7 +100,7 @@ Le flux de données est le suivant :
 5. Une alerte est générée si le scénario est déclenché
 
 <p align="center">
-  <img src="images/architecture.png" alt="Architecture du système" width="800"/>
+  <img src="images/architecture.png" alt="Architecture du système" width="1200"/>
 </p>
 
 > **Note**: Les intégrations avec les SIEM/SOAR et les alertes par email visibles sur le diagramme ne sont pas encore implémentées dans ce projet. Elles sont représentées à titre indicatif pour montrer les possibilités d'extension du système.
@@ -110,7 +110,7 @@ Le flux de données est le suivant :
 Le diagramme ci-dessous illustre la séquence des opérations depuis la génération d'un log jusqu'à l'envoi de la notification :
 
 <p align="center">
-  <img src="images/sequence.png" alt="Diagramme de séquence" width="800"/>
+  <img src="images/sequence.png" alt="Diagramme de séquence" width="1200"/>
 </p>
 
 ## Prérequis
@@ -237,7 +237,7 @@ docker exec crowdsec cscli alerts list
 ```
 
 <p align="center">
-  <img src="images/alertslist.png" alt="CrowdSec Alerts List" width="800"/>
+  <img src="images/alertslist.png" alt="CrowdSec Alerts List" width="1000"/>
 </p>
 
 ### Notifications Webhook
@@ -299,7 +299,7 @@ Voici comment fonctionne le processus de bout en bout :
 #### Exemple de payload webhook
 
 <p align="center">
-  <img src="images/webhook.png" alt="Webhook Payload" width="800"/>
+  <img src="images/webhook.png" alt="Webhook Payload" width="1000"/>
 </p>
 
 Cette intégration permet d'automatiser les réponses aux incidents d'élévation de privilèges, en connectant la détection à d'autres systèmes comme des SIEM, des outils de ticketing, ou des systèmes d'alertes.
