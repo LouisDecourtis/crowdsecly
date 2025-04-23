@@ -1,0 +1,5 @@
+source: file
+filenames:
+  - /tests/nginx/nginx.log
+labels:
+  type: syslog

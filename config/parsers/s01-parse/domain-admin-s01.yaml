@@ -1,0 +1,8 @@
+filter: "evt.Meta.log_type == 'domain_admin_log'"
+name: local/domain-admin-s01
+description: "Parser pour préserver les logs domain admin en s01-parse"
+debug: true
+onsuccess: next_stage
+statics:
+  - parsed: domain_admin
+    value: "true"

@@ -1,0 +1,19 @@
+#usual suspects
+/phpmyadmin
+/pma
+/admin
+/wp-admin
+/manager
+/wp-login
+/solr/
+/phpinfo
+#cve-2020-8958
+/boaform/
+#kcfinder file manager
+/kcfinder/upload.php
+#cisco asa
+/+cscoe+/
+#ivanti cve(s)
+/dana-na/
+#metasploit
+/repeater.php
