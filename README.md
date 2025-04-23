@@ -1,4 +1,4 @@
-# CrowdSec - Détection d'élévation de privilèges Domain Admin
+# CrowdSecLy - Détection d'élévation de privilèges Domain Admin
 
 [![GitHub](https://img.shields.io/github/license/LouisDecourtis/crowdsecly?color=blue)](https://github.com/LouisDecourtis/crowdsecly/blob/master/LICENSE)
 [![CrowdSec](https://img.shields.io/badge/CrowdSec-v1.5.3-blue)](https://crowdsec.net/)
