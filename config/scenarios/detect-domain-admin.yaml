@@ -8,3 +8,5 @@ scope:
 labels:
   severity: info
   service: custom
+  remediation: false
+blackhole: 1m
