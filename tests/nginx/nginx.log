@@ -31,3 +31,8 @@ Apr 23 16:45:30 dc15-srv13 lsass[12345]: User rootadmin2 was granted Domain Admi
 Apr 23 17:00:00 dc15-srv13 security[54321]: User superadmin has been added to Domain Admins group
 Apr 23 17:05:15 dc16-srv14 security[12345]: User admin123 has been added to Domain Admins group
 Apr 23 17:10:30 dc17-srv15 ActiveDirectory[54321]: SECURITY: User adminroot has been granted Domain Admin privileges
+Apr 23 17:10:30 dc17-srv15 ActiveDirectory[54321]: SECURITY: User adminroot has been granted Domain Admin privileges
+Apr 23 18:10:30 dc12-srv15 ActiveDirectory[54321]: SECURITY: User adminroot has been granted Domain Admin privileges
+Apr 23 18:12:30 dc15-srv11 ActiveDirectory[54321]: SECURITY: User solvik has been granted Domain Admin privileges
+Apr 23 18:10:30 dc12-srv15 ActiveDirectory[54321]: SECURITY: User adminroot has been granted Domain Admin privileges
+Apr 23 18:12:30 dc15-srv11 ActiveDirectory[54321]: SECURITY: User solvik has been granted Domain Admin privileges
